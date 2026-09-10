@@ -2,9 +2,9 @@ name: lake build
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main/main]
   push:
-    branches: [main]
+    branches: [main/main]
 
 concurrency:
   group: lake-build-${{ github.ref }}
