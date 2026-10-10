@@ -84,7 +84,7 @@ structure ROMPipeline where
 structure ROMTableEntry where
   beta   : AnnyBeta
   joints : Array JointROM
-  deriving Repr
+  deriving Repr, Inhabited
 
 /-- Nearest-neighbor lookup: find the table entry closest to the query β. -/
 def lookupNearest (table : Array ROMTableEntry) (query : AnnyBeta) : Option ROMTableEntry :=
@@ -112,8 +112,9 @@ private def testTable : Array ROMTableEntry := #[
 /-- Nearest lookup finds the closest β. -/
 theorem lookup_finds_nearest :
     let query : AnnyBeta := { coeffs := #[900, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
-    match lookupNearest testTable query with
-    | some entry => entry.beta.coeffs[0]! = 1000  -- closer to β₀=1000 than β₀=0
-    | none => False := by native_decide
+    -- Equivalent to `match … with | some e => e.beta.coeffs[0]! = 1000 | none => False`,
+    -- stated via `Option.map` so `Decidable` comes from `DecidableEq (Option Int)`.
+    (lookupNearest testTable query).map (·.beta.coeffs[0]!) = some 1000  -- closer to β₀=1000 than β₀=0
+    := by native_decide
 
 end PredictiveBVH.ROMTool
